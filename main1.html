@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Ticket Booking</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="filmcraze.jpg" alt="Logo">
+        </div>
+        <div class="nav">
+            <button onclick="window.location.href='movie_page_25-02-251.html'">Movies</button>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for movies..." onkeyup="searchMovies()">
+                <button type="button" onclick="searchMovies()">Search</button>
+            </div>
+            <div class="auth-buttons">
+                <button onclick="window.location.href='signup.html'">Sign Up/Login</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="banner">
+        <img src="banner.png" alt="Banner image">
+    </div>
+    
+    <h2>Popular Movies</h2>
+    <div class="movies-section" id="moviesList">
+        <div class="movie-poster">
+            <img src="gunturkaaram.jpg" alt="Guntur Kaaram" class="movie-item">
+        </div>
+        <div class="movie-poster">
+            <img src="aavesham.jpg" alt="Aavesham" class="movie-item">
+        </div>
+        <div class="movie-poster">
+            <img src="goat.jpg" alt="GOAT" class="movie-item">
+        </div>
+        <div class="movie-poster">
+            <img src="stree2.jpg" alt="Stree 2" class="movie-item">
+        </div>
+    </div>
+    
+    <div class="book-tickets-bar">
+        <button onclick="window.location.href='Movie page 25-02-251.html'">Book Tickets</button>
+    </div>
+
+    <script>
+        function searchMovies() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let movies = document.getElementsByClassName('movie-item');
+            
+            for (let movie of movies) {
+                let movieTitle = movie.alt.toLowerCase();
+                if (movieTitle.includes(input)) {
+                    movie.parentElement.style.display = "block";
+                } else {
+                    movie.parentElement.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

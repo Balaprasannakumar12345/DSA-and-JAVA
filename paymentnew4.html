@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Film Craze</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1bbcf1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .payment-container {
+            background-color: rgb(113, 226, 52);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #e009ef;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .confirmation-message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #28a745;
+            display: none;
+        }
+
+        .scan-instruction {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+            display: none;
+        }
+
+        #qr-code {
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+
+        .confirm-btn {
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: none; /* Initially hidden */
+        }
+
+        .confirm-btn:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h1>Complete Your Payment</h1>
+        <p>Selected Seats: <span id="selected-seats"></span></p>
+        <p>Total Amount: ₹<span id="total-amount"></span></p>
+        <button class="submit-btn" id="payNowButton">Pay Now</button>
+
+        <div id="qr-code"></div>
+
+        <p class="scan-instruction" id="scan-instruction">Scan the QR code to confirm your payment.</p>
+
+        <button class="confirm-btn" id="confirmBookingButton">Confirm Booking</button>
+
+        <div class="confirmation-message" id="confirmation-message">
+            Booking Confirmed! Thank you for your payment.
+        </div>
+    </div>
+
+    <script>
+        // Get selected seats and total amount from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedSeats = urlParams.get('seats') || "None";
+        const totalAmount = urlParams.get('total') || "0";
+
+        // Display the selected seats and total amount
+        document.getElementById('selected-seats').textContent = selectedSeats;
+        document.getElementById('total-amount').textContent = totalAmount;
+
+        // Handle "Pay Now" button click
+        document.getElementById('payNowButton').addEventListener('click', function () {
+            const qrCodeContainer = document.getElementById('qr-code');
+            qrCodeContainer.innerHTML = ''; // Clear any previous QR codes
+            qrCodeContainer.style.display = 'block'; // Show QR code container
+
+            // Ensure QR code is generated correctly
+            if (selectedSeats.trim() !== "" && totalAmount !== "0") {
+                new QRCode(qrCodeContainer, {
+                    text: `Booking Confirmed!\nSeats: ${selectedSeats}\nTotal: ₹${totalAmount}`,
+                    width: 200,
+                    height: 200,
+                });
+
+                // Show scan instruction
+                document.getElementById('scan-instruction').style.display = 'block';
+
+                // Show "Confirm Booking" button
+                document.getElementById('confirmBookingButton').style.display = 'block';
+
+                // Disable Pay Now button after generating QR
+                this.disabled = true;
+                this.textContent = 'Payment Initiated';
+                this.style.backgroundColor = '#6c757d';
+            } else {
+                alert("Error: No seats selected. Please go back and select seats.");
+            }
+        });
+
+        // Handle "Confirm Booking" button click
+        document.getElementById('confirmBookingButton').addEventListener('click', function () {
+            // Show confirmation message
+            document.getElementById('confirmation-message').style.display = 'block';
+
+            // Hide QR code, scan instruction, and confirm button after confirmation
+            document.getElementById('scan-instruction').style.display = 'none';
+            document.getElementById('qr-code').style.display = 'none';
+            this.style.display = 'none';
+
+            // Show final confirmation alert
+            alert("Payment was completed. Booking confirmed!");
+        });
+    </script>
+</body>
+</html>

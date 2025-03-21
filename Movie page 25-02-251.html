@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Selection</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1c1c1c;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin-top: 20px;
+            font-size: 2.5rem;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .filter-container select, .filter-container input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            width: 200px;
+        }
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .movie-card {
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-bottom: 3px solid #ff9800;
+        }
+        .movie-info {
+            padding: 10px;
+        }
+        .movie-info h3 {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select Your Movie</h1>
+    <div class="filter-container">
+        <select class="language-select" onchange="filterMovies()">
+            <option value="all">All Languages</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Tamil">Tamil</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Kannada">Kannada</option>
+        </select>
+        <input type="text" class="search-bar" placeholder="Search movies..." onkeyup="searchMovie()">
+    </div>
+    <div class="movies-grid" id="moviesGrid"></div>
+
+    <script>
+        let movies = [
+            { title: "TilluSquare", poster: "https://m.media-amazon.com/images/M/MV5BNTYyZGUyMzktMzhmMi00MjRjLThlMjUtZmRjMjdmNzQ2OWQ5XkEyXkFqcGc@._V1_.jpg", language: "Telugu", hero: "Siddhu Jonnalagadda", heroine: "Anupama Parameswaran", rating: "4.5/5" },
+            { title: "Pushpa2", poster: "https://m.media-amazon.com/images/M/MV5BZjllNTdiM2QtYjQ0Ni00ZGM1LWFlYmUtNWY0YjMzYWIxOTYxXkEyXkFqcGc@._V1_.jpg", language: "Telugu", hero: "Allu Arjun", heroine: "Rashmika", rating: "4.3/5" },
+            { title: "Hanuman", poster: "https://resizing.flixster.com/yl4Z6PxNXzHmqcvrfa0OFUPoJCk=/ems.cHJkLWVtcy1hc3NldHMvbW92aWVzLzNiMGE5M2M0LWQ0ZGItNDgzOS05Nzc5LWVhMTA4MjY0ZmE2YS5qcGc=", language: "Telugu", hero: "Teja Sajja", heroine: "Amrita Aiyer", rating: "4.5/5" },
+            { title: "Jawaan", poster: "https://upload.wikimedia.org/wikipedia/en/3/39/Jawan_film_poster.jpg", language: "Hindi" ,hero: "Shah Rukh Khan", heroine: "Nayanthara", rating: "4.5/5"},
+            { title: "Chhaava", poster: "https://m.media-amazon.com/images/M/MV5BMWI4N2Y5NWUtNzEwOC00YjYzLWEzY2ItN2YwYTIxYzBjZGZmXkEyXkFqcGc@._V1_.jpg", language: "Hindi" ,hero: "Vicky Kaushal", heroine: "Rashmika Mandanna", rating: "4.5/5"},
+            { title: "Animal", poster: "https://m.media-amazon.com/images/I/91zTlD7AY1L.jpg", language: "Hindi" ,hero: "Ranbir Kapoor", heroine: "Rashmika Mandanna ", rating: "4.5/5"},
+            { title: "Salaar", poster: "https://image.tmdb.org/t/p/original/mNHdClul57prczb5O0krrzyonnn.jpg", language: "Telugu" ,hero: "Prabas", heroine: " Shruti Haasan", rating: "4.5/5"},
+            { title: "War", poster: "https://m.media-amazon.com/images/M/MV5BMDZmYzZiYjAtMTllZC00NDQwLWFkZGQtYzg0NjVkZTExYWJmXkEyXkFqcGc@._V1_.jpg", language: "Hindi" ,hero: " Hrithik Roshan ", heroine: " Vaani Kapoor", rating: "4.5/5"},
+            { title: "Stree2", poster: "https://m.media-amazon.com/images/M/MV5BNWIzZjVmN2EtNGEyMy00MzVlLWIxMmItZjYzZGVjMzQ3N2VkXkEyXkFqcGc@._V1_.jpg", language: "Hindi" ,hero: " Rajkummar Rao", heroine: "Shraddha Kapoor", rating: "4.5/5"},
+            { title: "KGF", poster: "https://i.pinimg.com/736x/9c/a2/91/9ca291ac23b69ed5580cdf6e73fd913d.jpg", language: "Kannada" ,hero: "Yash", heroine: "Srinidhi Shetty", rating: "4.5/5"},
+            { title: "Vettaian", poster: "https://m.media-amazon.com/images/M/MV5BZDYwZDkzYWQtMWY3Mi00YTczLTkxNTktODNjMzRhYTRlNzRlXkEyXkFqcGc@._V1_.jpg", language: "Tamil" ,hero: "Rajinikanth ", heroine: "Manju Warrier", rating: "4.5/5"},
+            { title: "Amaran", poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-Sb2xpM-WVbh-8MMrjqZvxLtmxjk8yhdISA&s", language: "Tamil" ,hero: "Sivakarthikeyan ", heroine: "Sai Pallavi", rating: "4.5/5"},
+            { title: "Jailer", poster: "https://static.toiimg.com/photo/102602413.cms?imgsize=963075", language: "Tamil" ,hero: "Rajinikanth", heroine: "Ramaya krishnan", rating: "4.5/5"},
+            { title: "Premalu", poster: "https://m.media-amazon.com/images/M/MV5BNWMwZTYyYzgtOTMzYy00NDQzLTkzODAtMDc2NTcwZWZmMjNhXkEyXkFqcGc@._V1_.jpg", language: "Malayalam" ,hero: "Naslen", heroine: "Mamitha Baiju", rating: "4.5/5"},
+            { title: "Guntur Karam", poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUxq9ueB_ePtk2FsUCFpkrKXcdNYcqVcU3LA&s", language: "Telugu" ,hero: "Mahesh Babu", heroine: "Sreeleela", rating: "4.5/5"},
+            { title: "Leo", poster: "https://i.pinimg.com/736x/46/37/db/4637dbeccdf457d9086f4e19e3737863.jpg", language: "Tamil" ,hero: "Vijay", heroine: "Trisha", rating: "4.5/5"},
+            { title: "Vikranth Rona", poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKdC_tn6TLnrrMlm7JVO-CY7tXvc5MvT_opA&s", language: "Kannada" ,hero: "Kichcha Sudeep", heroine: "Milana Nagaraj", rating: "4.5/5"},
+            { title: "ARM", poster: "https://m.media-amazon.com/images/M/MV5BNmY5NjI5ZTQtNDAyZi00NjgyLWE3NzItODE4OGYxNmFkN2E2XkEyXkFqcGc@._V1_QL75_UX820_.jpg", language: "Malayalam" ,hero: "Tovino Thomas", heroine: "Krithi Shetty", rating: "4.5/5"},
+            { title: "Lucky Baskhar", poster: "https://m.media-amazon.com/images/M/MV5BMjEzN2ZjYjUtZTI3NC00MzMyLWJiNDAtMDBiZGEzNTBiY2RkXkEyXkFqcGc@._V1_.jpg", language: "Telugu" ,hero: "Dulquer Salmaan", heroine: "Meenakshi Chaudhary", rating: "4.5/5"},
+            { title: "Devara", poster: "https://m.media-amazon.com/images/M/MV5BNWY4NDgyN2QtNDRkZS00OGRjLWFhN2UtODc3Mzk2ZjQ0ZjhkXkEyXkFqcGc@._V1_.jpg", language: "Telugu" ,hero: "JR.NTR", heroine: "Janhvi Kapoor", rating: "4.5/5"},
+            { title: "Kantara", poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYIf9jONlQxPQ03wDpQ3tTu1WMaZZtBP4crQ&s", language: "Kannada" ,hero: "Rishab Shetty ", heroine: "Sapthami Gowda", rating: "4.5/5"},
+            { title: "12th fail", poster: "https://m.media-amazon.com/images/M/MV5BNTE3OTIxZDYtNjA0NC00N2YxLTg1NGQtOTYxNmZkMDkwOWNjXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", language: "Hindi" ,hero: "Vikrant Massey ", heroine: "Medha Shankr", rating: "4.5/5"},
+            { title: "Aavesham", poster: "https://image.tmdb.org/t/p/original/k5RWPaNjgRcNvGoawYaQHQwyctI.jpg", language: "Malayalam" ,hero: "Fahadh Faasil",  rating: "4.5/5"},
+            { title: "RRR", poster: "https://images5.alphacoders.com/131/1319750.jpeg", language: "Telugu" ,hero: "NTR ", heroine: "Alia bhatt", rating: "4.5/5"},
+            { title: "777 charlie", poster: "https://upload.wikimedia.org/wikipedia/en/e/e6/777_Charlie_%28soundtrack%29.jpg", language: "Kannada" ,hero: "Rakshit Shetty",rating: "4.5/5"},
+        ];
+
+        function displayMovies(movieList) {
+            const grid = document.getElementById("moviesGrid");
+            grid.innerHTML = "";
+            movieList.forEach(movie => {
+                let movieDiv = document.createElement("div");
+                movieDiv.className = "movie-card";
+                movieDiv.innerHTML = `
+                    <img src="${movie.poster}" alt="${movie.title}" onclick='bookSeats(${JSON.stringify(movie)})'>
+                    <div class="movie-info">
+                        <h3>${movie.title}</h3>
+                    </div>
+                `;
+                grid.appendChild(movieDiv);
+            });
+        }
+
+        function bookSeats(movie) {
+            window.location.href = `1.html?title=${encodeURIComponent(movie.title)}&poster=${encodeURIComponent(movie.poster)}&hero=${encodeURIComponent(movie.hero)}&heroine=${encodeURIComponent(movie.heroine)}&rating=${encodeURIComponent(movie.rating)}`;
+        }
+
+        function filterMovies() {
+            let lang = document.querySelector(".language-select").value;
+            let filteredMovies = movies.filter(movie => lang === "all" || movie.language === lang);
+            displayMovies(filteredMovies);
+        }
+
+        function searchMovie() {
+            let searchInput = document.querySelector(".search-bar").value.toLowerCase();
+            let filteredMovies = movies.filter(movie => movie.title.toLowerCase().includes(searchInput));
+            displayMovies(filteredMovies);
+        }
+
+        displayMovies(movies);
+    </script>
+</body>
+</html>

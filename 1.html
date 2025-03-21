@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Booking</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background-color: #222; color: white; }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .poster img { width: 200px; border-radius: 10px; }
+        .details { margin-top: 20px; text-align: left; }
+        .selection-container { margin-top: 20px; }
+        select, input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        .book-btn {
+            background: green;
+            color: white;
+            cursor: pointer;
+        }
+        .book-btn:hover { background: darkgreen; }
+        #bookingSection { display: none; }
+    </style>
+</head>
+<body>
+    <h1 id="movieTitle">Movie Name</h1>
+
+    <div class="container">
+        <div class="poster">
+            <img id="moviePoster" src="https://m.media-amazon.com/images/M/MV5BNTYyZGUyMzktMzhmMi00MjRjLThlMjUtZmRjMjdmNzQ2OWQ5XkEyXkFqcGc@._V1_.jpg" alt="Movie Poster">
+        </div>
+        <div class="details">
+            <p><strong>Hero:</strong> <span id="movieHero"></span></p>
+            <p><strong>Heroine:</strong> <span id="movieHeroine"></span></p>
+            <p><strong>Rating:</strong> <span id="movieRating"></span></p>
+        </div>
+
+        <button class="book-btn" onclick="showBookingOptions()">Book Tickets</button>
+
+        <div id="bookingSection" class="selection-container">
+            <h2>Select Date</h2>
+            <input type="date" id="datePicker">
+
+            <h2>Select Time</h2>
+            <select id="timePicker">
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="1:00 PM">1:00 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="7:00 PM">7:00 PM</option>
+            </select>
+
+            <button class="book-btn" onclick="proceedToSeats()">Proceed to Seat Selection</button>
+        </div>
+    </div>
+
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                title: params.get("title"),
+                poster: params.get("poster"),
+                hero: params.get("hero"),
+                heroine: params.get("heroine"),
+                rating: params.get("rating")
+            };
+        }
+
+        let movie = getQueryParams();
+        document.getElementById("movieTitle").textContent = movie.title;
+        document.getElementById("moviePoster").src = movie.poster;
+        document.getElementById("movieHero").textContent = movie.hero;
+        document.getElementById("movieHeroine").textContent = movie.heroine;
+        document.getElementById("movieRating").textContent = movie.rating;
+
+        function showBookingOptions() {
+            document.getElementById("bookingSection").style.display = "block";
+        }
+
+        function proceedToSeats() {
+            const date = document.getElementById("datePicker").value;
+            const time = document.getElementById("timePicker").value;
+            
+            if (!date) {
+                alert("Please select a date!");
+                return;
+            }
+            
+            window.location.href = `seat-booking4.html?title=${encodeURIComponent(movie.title)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`;
+        }
+    </script>
+</body>
+</html>
