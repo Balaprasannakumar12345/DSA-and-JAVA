@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seat Booking - Film Craze</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #dfbd23f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .seat-booking-container {
+      background-color: rgba(68, 63, 64, 0.949);
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      width: 100%;
+      max-width: 800px;
+      color: white;
+    }
+
+    .seat-category {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .seat-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .row-label {
+      font-weight: bold;
+      width: 20px;
+    }
+
+    .seat {
+      width: 50px;
+      height: 50px;
+      background-color: #1859c2;
+      border: 2px solid #fff;
+      text-align: center;
+      line-height: 50px;
+      cursor: pointer;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .seat:hover {
+      background-color: #007bff;
+      transform: scale(1.1);
+    }
+
+    .seat.selected {
+      background-color: #28a745;
+    }
+
+    .seat.booked {
+      background-color: #dc3545;
+      cursor: not-allowed;
+    }
+
+    .seat.recliner {
+      background-color: #ffc107;
+    }
+
+    .seat.recliner.selected {
+      background-color: #44ff33;
+    }
+    .seat.recliner.booked{
+        background-color:red;
+    }
+    .bottom-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .selected-seats {
+      text-align: left;
+      font-size: 1rem;
+      font-weight: bold;
+      flex: 1;
+    }
+
+    .submit-btn {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="seat-booking-container">
+    <h1>{{ title }}</h1>
+    <img src="{{ poster }}" width="200"><br>
+    <p><strong>Date:</strong> {{ date }}</p>
+    <p><strong>Time:</strong> {{ time }}</p>
+
+    <h2>Select Your Seats</h2>
+    <div class="seat-category">Recliner Seats</div>
+    <div id="recliner-seat-container"></div>
+
+    <div class="seat-category">Economy Seats</div>
+    <div id="economy-seat-container"></div>
+
+    <div class="bottom-section">
+      <div class="selected-seats">
+        <p>Selected Seats: <span id="selected-seats-list"></span></p>
+        <p>Total Price: ₹<span id="total-price">0</span></p>
+      </div>
+      <button class="submit-btn" id="confirmButton">Proceed to Payment</button>
+    </div>
+
+    <!-- Hidden form to POST to /payment -->
+    <form id="paymentForm" action="/payment" method="POST">
+      <input type="hidden" name="title" value="{{ title }}">
+      <input type="hidden" name="poster" value="{{ poster }}">
+      <input type="hidden" name="date" value="{{ date }}">
+      <input type="hidden" name="time" value="{{ time }}">
+      <input type="hidden" name="seats" id="seatsInput">
+      <input type="hidden" name="total" id="totalInput">
+    </form>
+  </div>
+
+  <!-- ... [HTML HEAD + BODY as above] ... -->
+
+<!-- Inject bookedSeats safely -->
+<script>
+    const bookedSeats = {{ booked_seats | tojson | safe }};
+  </script>
+  
+  <script>
+    const selectedSeats = [];
+    const normalSeatPrice = 200;
+    const reclinerSeatPrice = 400;
+  
+    const seatRows = {
+      'A': 'recliner', 'B': 'recliner', 'C': 'recliner',
+      'D': 'normal', 'E': 'normal', 'F': 'normal', 'G': 'normal', 'H': 'normal'
+    };
+  
+    const reclinerSeatContainer = document.getElementById("recliner-seat-container");
+    const economySeatContainer = document.getElementById("economy-seat-container");
+  
+    for (const row in seatRows) {
+      const rowDiv = document.createElement("div");
+      rowDiv.classList.add("seat-row");
+  
+      const label = document.createElement("div");
+      label.classList.add("row-label");
+      label.textContent = row;
+      rowDiv.appendChild(label);
+  
+      for (let i = 1; i <= 12; i++) {
+        const seat = document.createElement("div");
+        seat.classList.add("seat");
+        if (seatRows[row] === "recliner") seat.classList.add("recliner");
+  
+        const seatId = row + i;
+        seat.textContent = i;
+        seat.dataset.seat = seatId;
+        seat.dataset.type = seatRows[row];
+  
+        if (bookedSeats.includes(seatId)) {
+          seat.classList.add("booked");
+        } else {
+          seat.addEventListener("click", () => toggleSeat(seat));
+        }
+  
+        rowDiv.appendChild(seat);
+      }
+  
+      if (seatRows[row] === "recliner") {
+        reclinerSeatContainer.appendChild(rowDiv);
+      } else {
+        economySeatContainer.appendChild(rowDiv);
+      }
+    }
+  
+    function toggleSeat(seat) {
+      const seatId = seat.dataset.seat;
+      if (seat.classList.contains("selected")) {
+        seat.classList.remove("selected");
+        const index = selectedSeats.findIndex(s => s.id === seatId);
+        if (index !== -1) selectedSeats.splice(index, 1);
+      } else {
+        seat.classList.add("selected");
+        selectedSeats.push({ id: seatId, type: seat.dataset.type });
+      }
+      updateSelectedSeats();
+    }
+  
+    function updateSelectedSeats() {
+      document.getElementById("selected-seats-list").textContent = selectedSeats.map(s => s.id).join(", ");
+      const total = selectedSeats.reduce((sum, seat) => {
+        return sum + (seat.type === "recliner" ? reclinerSeatPrice : normalSeatPrice);
+      }, 0);
+      document.getElementById("total-price").textContent = total;
+    }
+  
+    document.getElementById("confirmButton").addEventListener("click", function () {
+      if (selectedSeats.length === 0) {
+        alert("Please select at least one seat.");
+        return;
+      }
+  
+      document.getElementById("seatsInput").value = selectedSeats.map(seat => seat.id).join(",");
+      document.getElementById("totalInput").value = document.getElementById("total-price").textContent;
+      document.getElementById("paymentForm").submit();
+    });
+  </script>
+  

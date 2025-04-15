@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment - Film Craze</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #1bbcf1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .payment-container {
+      background-color: rgb(113, 226, 52);
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .submit-btn {
+      padding: 10px 20px;
+      background-color: #e009ef;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #qr-image, #scan-instruction, .confirm-btn {
+      display: none;
+    }
+
+    #qr-image {
+      margin-top: 20px;
+      width: 200px;
+      height: 200px;
+    }
+
+    .confirm-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #thank-you-message {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #333;
+      display: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-container"
+       data-title="{{ title }}"
+       data-date="{{ date }}"
+       data-time="{{ time }}"
+       data-seats="{{ seats }}"
+       data-total="{{ total }}">
+       
+    <h1>Complete Your Payment</h1>
+
+    <p><strong>Movie:</strong> {{ title }}</p>
+    <p><strong>Date:</strong> {{ date }}</p>
+    <p><strong>Time:</strong> {{ time }}</p>
+    <p><strong>Selected Seats:</strong> {{ seats }}</p>
+    <p><strong>Total Amount:</strong> ₹{{ total }}</p>
+
+    <button class="submit-btn" id="payNowButton">Pay Now</button>
+
+    <img id="qr-image" src="/static/image.png" alt="PhonePe QR Code">
+    <p id="scan-instruction">Scan the QR code to complete your payment</p>
+
+    <form id="bookingForm" action="/confirm-payment" method="POST">
+      <input type="hidden" name="title" value="{{ title }}">
+      <input type="hidden" name="poster" value="{{ poster }}">
+      <input type="hidden" name="date" value="{{ date }}">
+      <input type="hidden" name="time" value="{{ time }}">
+      <input type="hidden" name="seats" value="{{ seats }}">
+      <input type="hidden" name="total" value="{{ total }}">
+      <button type="submit" class="confirm-btn" id="confirmBookingButton">Payment Completed</button>
+    </form>
+
+    <p id="thank-you-message">🎉 Thanks for booking with Film Craze!</p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const payBtn = document.getElementById("payNowButton");
+      const qrImage = document.getElementById("qr-image");
+      const scanText = document.getElementById("scan-instruction");
+      const confirmBtn = document.getElementById("confirmBookingButton");
+      const thankYou = document.getElementById("thank-you-message");
+      const form = document.getElementById("bookingForm");
+
+      payBtn.addEventListener("click", function () {
+        qrImage.style.display = "block";
+        scanText.style.display = "block";
+        confirmBtn.style.display = "inline-block";
+
+        payBtn.disabled = true;
+        payBtn.textContent = "Payment Initiated";
+        payBtn.style.backgroundColor = "#6c757d";
+      });
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        alert("🎫 Your ticket has been booked!");
+        thankYou.style.display = "block";
+        setTimeout(() => form.submit(), 1000);
+      });
+    });
+  </script>
+</body>
+</html>

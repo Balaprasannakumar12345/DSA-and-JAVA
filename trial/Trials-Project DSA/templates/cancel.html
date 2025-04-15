@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cancel Booking</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f2f2f2;
+      padding: 40px;
+    }
+
+    h2 {
+      color: #e60000;
+      text-align: center;
+    }
+
+    .booking {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    .cancel-btn {
+      background-color: #ff4d4d;
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      background-color: #cc0000;
+    }
+
+    .no-bookings {
+      text-align: center;
+      font-size: 18px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Your Bookings</h2>
+
+  <!-- ✅ Flash Messages -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <script>alert("{{ messages[0] }}");</script>
+    {% endif %}
+  {% endwith %}
+
+  {% if bookings %}
+    {% for booking in bookings %}
+      <div class="booking">
+        <p><strong>Movie:</strong> {{ booking.movie_name }}</p>
+        <p><strong>Date:</strong> {{ booking.date }}</p>
+        <p><strong>Time:</strong> {{ booking.time }}</p>
+        <p><strong>Seats:</strong> {{ booking.seats_selected }}</p>
+
+        <form method="POST" action="/cancel-ticket" onsubmit="return confirm('Are you sure you want to cancel this ticket?');">
+          <input type="hidden" name="booking_id" value="{{ booking.id }}">
+          <button type="submit" class="cancel-btn">Cancel Ticket</button>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="no-bookings">No bookings found for your account.</div>
+  {% endif %}
+
+</body>
+</html>

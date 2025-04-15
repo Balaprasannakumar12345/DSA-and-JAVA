@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      padding: 20px;
+    }
+    .search-bar, .language-select {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    .movie-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .movie-card {
+      background-color: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      width: 200px;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s;
+    }
+    .movie-card:hover {
+      transform: scale(1.05);
+    }
+    .movie-card img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+    .movie-info {
+      padding: 10px;
+    }
+    .movie-info h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .movie-info p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎬 Now Showing</h1>
+
+  <input type="text" class="search-bar" placeholder="Search movie..." onkeyup="searchMovie()">
+  <select class="language-select" onchange="filterMovies()">
+    <option value="all">All Languages</option>
+    <option value="Telugu">Telugu</option>
+    <option value="Hindi">Hindi</option>
+    <option value="Malayalam">Malayalam</option>
+    <option value="Tamil">Tamil</option>
+    <option value="Kannada">Kannada</option>
+  </select>
+
+  <div id="moviesGrid" class="movie-grid"></div>
+
+  <script>
+    // Get the list of movies from Flask
+    const movies = {{ movies | tojson }};
+
+    function displayMovies(movieList) {
+      const grid = document.getElementById("moviesGrid");
+      grid.innerHTML = "";
+      movieList.forEach(movie => {
+        const card = document.createElement("div");
+        card.className = "movie-card";
+        card.onclick = function () {
+          const url = `/movie-details?title=${encodeURIComponent(movie.title)}&poster=${encodeURIComponent(movie.poster)}&hero=${encodeURIComponent(movie.hero)}&heroine=${encodeURIComponent(movie.heroine)}&rating=${encodeURIComponent(movie.rating)}`;
+          window.location.href = url;
+        };
+        card.innerHTML = `
+          <img src="${movie.poster || 'https://via.placeholder.com/200'}" alt="${movie.title}">
+          <div class="movie-info">
+            <h3>${movie.title}</h3>
+            <p>${movie.language}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterMovies() {
+      const lang = document.querySelector(".language-select").value;
+      const filtered = lang === "all" ? movies : movies.filter(m => m.language === lang);
+      displayMovies(filtered);
+    }
+
+    function searchMovie() {
+      const query = document.querySelector(".search-bar").value.toLowerCase();
+      const filtered = movies.filter(m => m.title.toLowerCase().includes(query));
+      displayMovies(filtered);
+    }
+
+    // Initial display
+    displayMovies(movies);
+  </script>
+</body>
+</html>

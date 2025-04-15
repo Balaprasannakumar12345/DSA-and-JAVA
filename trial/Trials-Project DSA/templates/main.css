@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color:rgb(223, 183, 171);
+}
+
+pre {
+    font-size: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333333;
+    color: white;
+}
+
+.logo img {
+    height: 50px;
+    width: 80px;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav button {
+    margin-right: 20px;
+    padding: 10px 20px;
+    background-color: #12030300;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.nav button:hover {
+    background-color: #777;
+}
+
+.search-bar input[type="text"] {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+}
+
+.search-bar button {
+    padding: 8px 12px;
+    margin-left: 5px;
+    border: none;
+    background-color: #555;
+    color: white;
+    border-radius: 4px;
+
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #777;
+}
+
+.banner img {
+    width: 1900px;
+    height: 550px;
+}
+
+
+.movie-poster img {
+    width: 200px;  /* Set the width for all posters */
+    height: 300px; /* Set the height for all posters */
+    object-fit: cover; /* Ensure the image fits without distortion */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for effect */
+    transition: transform 0.3s ease; /* Smooth zoom effect on hover */
+}
+
+.movie-poster {
+    margin: 10px;
+}
+
+.movies-section {
+    display: flex;
+    justify-content: space-around;
+    align-items:center;
+    padding: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background-color:rgb(154, 109, 56)
+}
+
+.book-tickets-bar {
+    background-color: rgb(154, 109, 56);
+    color: white;
+    padding: 15px 0;    
+    text-align: center;
+    width: 100%;
+}
+
+.book-tickets-bar button {
+    background-color: #c6a26c;
+    color: rgb(250, 4, 4);
+    padding: 10px 490px;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.book-tickets-bar button:hover {
+    background-color: #f0f0f0;
+}

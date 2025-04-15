@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .poster img {
+            width: 200px;
+            border-radius: 10px;
+        }
+        .details {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .selection-container {
+            margin-top: 20px;
+        }
+        select, input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        .book-btn {
+            background: green;
+            color: white;
+            cursor: pointer;
+        }
+        .book-btn:hover {
+            background: darkgreen;
+        }
+        #bookingSection {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="movieTitle">Movie Name</h1>
+
+    <div class="container">
+        <div class="poster">
+            <img id="moviePoster" src="" alt="Movie Poster">
+        </div>
+        <div class="details">
+            <p><strong>Hero:</strong> <span id="movieHero"></span></p>
+            <p><strong>Heroine:</strong> <span id="movieHeroine"></span></p>
+            <p><strong>Rating:</strong> <span id="movieRating"></span></p>
+        </div>
+
+        <!-- Show Booking Section -->
+        <button class="book-btn" id="bookBtn" onclick="showBookingOptions()">Book Tickets</button>
+
+        <!-- Proceed to Seat Selection Form -->
+        <form id="bookForm" action="/seat-booking" method="get" onsubmit="return addToForm()">
+            <input type="hidden" name="title" id="formTitle">
+            <input type="hidden" name="poster" id="formPoster">
+            <input type="hidden" name="hero" id="formHero">
+            <input type="hidden" name="heroine" id="formHeroine">
+            <input type="hidden" name="rating" id="formRating">
+            <input type="hidden" name="date" id="formDate">
+            <input type="hidden" name="time" id="formTime">
+
+            <div id="bookingSection" class="selection-container">
+                <h2>Select Date</h2>
+                <input type="date" id="datePicker" required>
+
+                <h2>Select Time</h2>
+                <select id="timePicker">
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="7:00 PM">7:00 PM</option>
+                </select>
+
+                <br>
+                <button type="submit" class="book-btn">Proceed to Seat Selection</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Extract movie data from query string
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                title: params.get("title"),
+                poster: params.get("poster"),
+                hero: params.get("hero"),
+                heroine: params.get("heroine"),
+                rating: params.get("rating")
+            };
+        }
+
+        // Set movie data on page
+        let movie = getQueryParams();
+        document.getElementById("movieTitle").textContent = movie.title;
+        document.getElementById("moviePoster").src = movie.poster;
+        document.getElementById("movieHero").textContent = movie.hero;
+        document.getElementById("movieHeroine").textContent = movie.heroine;
+        document.getElementById("movieRating").textContent = movie.rating;
+
+        // Show date/time selection
+        function showBookingOptions() {
+            document.getElementById("bookingSection").style.display = "block";
+            document.getElementById("bookBtn").style.display = "none";
+        }
+
+        // Handle form submission
+        function addToForm() {
+            const date = document.getElementById("datePicker").value;
+            const time = document.getElementById("timePicker").value;
+
+            if (!date) {
+                alert("Please select a date!");
+                return false;
+            }
+
+            document.getElementById("formTitle").value = movie.title;
+            document.getElementById("formPoster").value = movie.poster;
+            document.getElementById("formHero").value = movie.hero;
+            document.getElementById("formHeroine").value = movie.heroine;
+            document.getElementById("formRating").value = movie.rating;
+            document.getElementById("formDate").value = date;
+            document.getElementById("formTime").value = time;
+
+            return true;
+        }
+
+        // Auto-set today's date in date picker
+        window.onload = function() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const dd = String(today.getDate()).padStart(2, '0');
+            const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+            const dateInput = document.getElementById("datePicker");
+            dateInput.value = formattedToday;
+            dateInput.min = formattedToday; // Prevent past dates
+        };
+    </script>
+</body>
+</html>
